@@ -1,3 +1,11 @@
+## 2021-01-06 - Release 2.1
+
+### Summary
+
+- Added support for publishing device state (on, off) events
+- On device state off, publish zero temperature for all probes
+- Updated mqtt publish for battery and device state topics to enable retain
+
 ## 2019-08-18 - Release 2.0
 
 ### Summary
