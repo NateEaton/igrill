@@ -98,16 +98,18 @@ def mqtt_init(mqtt_config):
     return mqtt_client
 
 
-def publish(temperatures, battery, heating_element, client, base_topic, device_name):
+def publish(temperatures, battery, heating_element, device_state, client, base_topic, device_name):
     for i in range(1, 5):
         if temperatures[i]:
             client.publish("{0}/{1}/probe{2}".format(base_topic, device_name, i), temperatures[i])
 
     if battery:
-        client.publish("{0}/{1}/battery".format(base_topic, device_name), battery)
+        client.publish("{0}/{1}/battery".format(base_topic, device_name), battery, retain=True)
     if heating_element:
         client.publish("{0}/{1}/heating_element".format(base_topic, device_name), heating_element)
-
+    if device_state:
+	logging.debug("Publish device_state as {}".format(device_state))
+        client.publish("{0}/{1}/device_state".format(base_topic, device_name), device_state, retain=True)
 
 def get_devices(device_config):
     if device_config is None:

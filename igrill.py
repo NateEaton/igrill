@@ -207,20 +207,29 @@ class DeviceThread(threading.Thread):
 
     def run(self):
         while self.run_event.is_set():
+	    logging.debug("Resetting device_state variable")
+	    device_state = "off";
             try:
                 logging.debug("Device thread {} (re)started, trying to connect to iGrill with address: {}".format(self.name, self.address))
                 device = self.device_types[self.type](self.address, self.name)
                 self.mqtt_client.reconnect()
+		logging.debug("Device connected")
                 while True:
+		    device_state = "on";
                     temperature = device.read_temperature(self.publish_missing_probes, self.missing_probe_value)
                     battery = device.read_battery()
                     heating_element = device.read_heating_elements()
-                    utils.publish(temperature, battery, heating_element, self.mqtt_client, self.topic, device.name)
-                    logging.debug("Published temp: {} and battery: {} to topic {}/{}".format(temperature, battery, self.topic, device.name))
+                    utils.publish(temperature, battery, heating_element, device_state, self.mqtt_client, self.topic, device.name)
+                    logging.debug("Published temp: {} and battery: {} to topic {}/{} with device_state {}".format(temperature, battery, self.topic, device.name, device_state))
                     logging.debug("Sleeping for {} seconds".format(self.interval))
                     time.sleep(self.interval)
             except Exception as e:
-                logging.debug(e)
+                logging.debug("Exception raised: {}".format(e))
+		if device_state == "on":
+		    logging.debug("Inferred disconnection")
+		    device_state = "off";
+		    temps = {1: "0", 2: "0", 3: "0", 4: "0"}
+                    utils.publish(temps, battery, heating_element, device_state, self.mqtt_client, self.topic, device.name)
                 logging.debug("Sleeping for {} seconds before retrying".format(self.interval))
                 time.sleep(self.interval)
 
