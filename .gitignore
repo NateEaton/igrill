@@ -59,6 +59,7 @@ docs/_build/
 target/
 
 # igrill config
-/*.yaml
-/*.yml
-config/
+# Now protected with git-crypt
+#/*.yaml
+#/*.yml
+#config/

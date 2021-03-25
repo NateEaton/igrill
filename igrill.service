@@ -1,0 +1,12 @@
+[Unit]
+Description=igrill MQTT service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=2
+ExecStart=/usr/bin/python /home/pi/igrill/monitor.py -c /home/pi/igrill/config
+
+[Install]
+WantedBy=multi-user.target
